@@ -1,6 +1,30 @@
 @FileStorageService_HostAddress = http://localhost:5040
+@ContentType = application/json
 
-GET {{FileStorageService_HostAddress}}/weatherforecast/
-Accept: application/json
+### 1. Загрузка нового файла
+POST {{FileStorageService_HostAddress}}/api/files
+Content-Type: {{ContentType}}
 
-###
+{
+  "FileName": "example.txt",
+  "Content": "This is the content of the example file."
+}
+
+### 2. Получение содержимого файла по ID
+GET {{FileStorageService_HostAddress}}/api/files/content/{{$guid}}
+Accept: {{ContentType}}
+
+### 3. Проверка существования файла по хешу (через анализ)
+POST {{FileStorageService_HostAddress}}/api/files/check-exists
+Content-Type: {{ContentType}}
+
+{
+  "Content": "This is the content of the example file."
+}
+
+### 4. Получение метаданных файла
+GET {{FileStorageService_HostAddress}}/api/files/{{$guid}}/metadata
+Accept: {{ContentType}}
+
+### 5. Удаление файла
+DELETE {{FileStorageService_HostAddress}}/api/files/{{$guid}}

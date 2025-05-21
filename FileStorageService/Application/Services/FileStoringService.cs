@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using FileStorageService.Application.DTO;
 using FileStorageService.Domain.Entities;
 using FileStorageService.Domain.Interfaces;
@@ -9,7 +11,9 @@ public class FileStoringService : IFileStoringService
     private readonly IFileStoringRepository _repository;
     private readonly IWebHostEnvironment _env;
 
-    public FileStoringService(IFileStoringRepository repository, IWebHostEnvironment env)
+    public FileStoringService(
+        IFileStoringRepository repository,
+        IWebHostEnvironment env)
     {
         _repository = repository;
         _env = env;
@@ -25,25 +29,25 @@ public class FileStoringService : IFileStoringService
 
     public Guid AddFile(FileUploadDto fileDto, int hash)
     {
-        // Проверяем существование файла с таким хешом
+        // Проверка существования файла по хешу
         var existingFile = _repository.GetByHash(hash);
         if (existingFile != null)
         {
-            return existingFile.Id; // Возвращаем ID существующего файла
+            return existingFile.Id;
         }
 
-        // Создаем путь для сохранения файла
+        // Генерация пути для сохранения файла
         var uploadsPath = Path.Combine(_env.ContentRootPath, "uploads");
         Directory.CreateDirectory(uploadsPath);
         var filePath = Path.Combine(uploadsPath, $"{Guid.NewGuid()}.txt");
 
-        // Сохраняем файл на диск
+        // Сохранение файла
         File.WriteAllText(filePath, fileDto.Content);
 
-        // Создаем новую запись
+        // Создание сущности
         var newFile = new FileHolder(
             id: Guid.NewGuid(),
-            name: fileDto.FileName,
+            name: fileDto.FileName!,
             hash: hash,
             dir: filePath
         );

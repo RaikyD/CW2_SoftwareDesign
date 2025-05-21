@@ -1,9 +1,7 @@
 using FileStorageService.Domain.Entities;
 using FileStorageService.Domain.Interfaces;
-using FileStorageService.Infrastructure.Repos;
-using Microsoft.EntityFrameworkCore;
 
-namespace FileStorageService.Infrastructure.Repositories;
+namespace FileStorageService.Infrastructure.Repos;
 
 public class FileStoringRepository : IFileStoringRepository
 {

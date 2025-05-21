@@ -1,9 +1,9 @@
 using FileStorageService.Application.Services;
 using FileStorageService.Domain.Interfaces;
 using FileStorageService.Infrastructure.Repos;
-using FileStorageService.Infrastructure.Repositories;
 using FileStorageService.Presentation.Controllers;
 using Microsoft.EntityFrameworkCore;
+using SharedContacts.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,30 +11,27 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<FileStorageSettings>(
     builder.Configuration.GetSection("FileStorageSettings"));
 
-// Регистрация сервисов
+// Регистрация репозиториев и сервисов
 builder.Services.AddScoped<IFileStoringRepository, FileStoringRepository>();
 builder.Services.AddScoped<IFileStoringService, FileStoringService>();
 
-// Регистрация HttpClient для вызова FileAnalysisService
-builder.Services.AddHttpClient("AnalysisService", client =>
+// Регистрация HttpClient для FileAnalysisClient
+builder.Services.AddHttpClient<FileAnalysisClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:AnalysisService"]!);
-    client.Timeout = TimeSpan.FromSeconds(30);
-    client.DefaultRequestHeaders.Accept.Add(
-        new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+    client.BaseAddress = new Uri(builder.Configuration["Services:FileAnalysisService"]!);
 });
 
-// Регистрация DbContext
+// Настройка БД
 builder.Services.AddDbContext<FileStoringDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("FileStorageDatabase")));
 
-// Настройка Minimal API
+// Minimal API
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Конфигурация HTTP pipeline
+// Конвейер обработки запросов
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -45,25 +42,24 @@ app.UseHttpsRedirection();
 
 // Регистрация эндпоинтов
 app.MapGroup("/api/files")
-   .MapFileStorageApi()
-   .WithTags("File Storage API");
+    .MapFileStorageApi()
+    .WithTags("File Storage API");
 
-// Миграции базы данных
+// Применение миграций
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<FileStoringDbContext>();
     dbContext.Database.Migrate();
     
-    // Создаем папку для загрузок, если не существует
+    // Создание папки для загрузок
     var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
     Directory.CreateDirectory(uploadsPath);
 }
 
 app.Run();
 
-// Настройки для хранения файлов (добавьте в appsettings.json)
 public class FileStorageSettings
 {
     public string UploadPath { get; set; } = "uploads";
-    public long MaxFileSize { get; set; } = 10 * 1024 * 1024; // 10MB
+    public long MaxFileSize { get; set; } = 10 * 1024 * 1024;
 }
