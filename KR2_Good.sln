@@ -8,6 +8,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileAnalysisService", "File
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedContacts", "SharedContacts\SharedContacts.csproj", "{D9E6E626-A88E-4060-B94D-F2274803AF61}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{938F8629-5412-48E2-88A4-A64D1C12519D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileStorageTests", "FileStorageTests\FileStorageTests.csproj", "{20481ED6-8CD3-4347-A021-39FE785589F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileAnalysisTests", "FileAnalysisTests\FileAnalysisTests.csproj", "{71E6E8B5-33BD-4808-9109-FF1B9E198C2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +36,13 @@ Global
 		{D9E6E626-A88E-4060-B94D-F2274803AF61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9E6E626-A88E-4060-B94D-F2274803AF61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9E6E626-A88E-4060-B94D-F2274803AF61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20481ED6-8CD3-4347-A021-39FE785589F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20481ED6-8CD3-4347-A021-39FE785589F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20481ED6-8CD3-4347-A021-39FE785589F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20481ED6-8CD3-4347-A021-39FE785589F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71E6E8B5-33BD-4808-9109-FF1B9E198C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71E6E8B5-33BD-4808-9109-FF1B9E198C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71E6E8B5-33BD-4808-9109-FF1B9E198C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71E6E8B5-33BD-4808-9109-FF1B9E198C2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

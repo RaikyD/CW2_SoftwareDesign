@@ -23,8 +23,22 @@ public class FileStoringService : IFileStoringService
     {
         if (id == Guid.Empty)
             throw new ArgumentException("Invalid file ID.");
-
+        Console.WriteLine(_repository.Get(id).FileDirectory);
         return _repository.Get(id);
+    }
+
+    public bool HashExists(int hash)
+    {
+        FileHolder file = _repository.GetByHash(hash);
+        if (file != null)
+            return true;
+        return false;
+    }
+
+    public Guid GetFileIdByHash(int hash)
+    {
+        FileHolder file = _repository.GetByHash(hash);
+        return file.Id;
     }
 
     public Guid AddFile(FileUploadDto fileDto, int hash)
@@ -47,11 +61,16 @@ public class FileStoringService : IFileStoringService
         // Создание сущности
         var newFile = new FileHolder(
             id: Guid.NewGuid(),
-            name: fileDto.FileName!,
-            hash: hash,
-            dir: filePath
+            fileName: fileDto.FileName!,
+            hash: hash, 
+            fileDirectory: filePath
         );
-
-        return _repository.Add(newFile);
+        _repository.Add(newFile);
+        return newFile.Id;
+    }
+    
+    public async Task<byte[]> GetFileContentAsync(FileHolder fileHolder)
+    {
+        return await File.ReadAllBytesAsync(fileHolder.FileDirectory);
     }
 }

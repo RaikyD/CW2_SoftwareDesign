@@ -1,5 +1,6 @@
 namespace FileStorageService.Domain.Entities;
-
+// OK Vrode
+// Maybe change Hash type only to string
 public class FileHolder
 {
     public Guid Id { get; init; }
@@ -7,11 +8,11 @@ public class FileHolder
     public int Hash { get; init; }
     public string FileDirectory { get; init; }
 
-    public FileHolder(Guid id, string name, int hash, string dir)
+    public FileHolder(Guid id, string fileName, int hash, string fileDirectory)
     {
         Id = id;
-        FileName = name;
+        FileName = fileName;
         Hash = hash;
-        FileDirectory = dir;
+        FileDirectory = fileDirectory;
     }
 }

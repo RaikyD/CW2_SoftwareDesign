@@ -1,0 +1,103 @@
+services:
+  # ---------------------------  БАЗЫ ДАННЫХ  ---------------------------
+  file-storage-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: filestorage
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - file-storage-db-data:/var/lib/postgresql/data
+    ports: ["5433:5432"]
+    networks: [backend]
+
+  file-analysis-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fileanalysis
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - file-analysis-db-data:/var/lib/postgresql/data
+    ports: ["5434:5432"]
+    networks: [backend]
+
+  # ---------------------------  FILE-STORAGE  --------------------------
+  file-storage-service:
+    build:
+      context: .
+      dockerfile: FileStorageService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80              
+      - ConnectionStrings__FileStorageDatabase=Host=file-storage-db;Port=5432;Database=filestorage;Username=postgres;Password=postgres
+      - Services__FileAnalysisService=http://file-analysis-service:80
+    depends_on:
+      file-storage-db:
+        condition: service_healthy
+    ports:
+      - "7001:80"                                
+    volumes:
+      - storage-uploads:/app/uploads
+    networks: [backend]
+
+  # ---------------------------  FILE-ANALYSIS  -------------------------
+  file-analysis-service:
+    build:
+      context: .
+      dockerfile: FileAnalysisService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__FileAnalysisDatabase=Host=file-analysis-db;Port=5432;Database=fileanalysis;Username=postgres;Password=postgres
+      - Services__FileStorageService=http://file-storage-service:80 
+    depends_on:
+      file-analysis-db:
+        condition: service_healthy
+      file-storage-service:
+        condition: service_started
+    ports:
+      - "7002:80"                                 
+    networks: [backend]
+
+  # ---------------------------     GATEWAY     -------------------------
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+  
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - FileStorageService__Url=http://file-storage-service:80
+      - FileAnalysisService__Url=http://file-analysis-service:80
+
+    depends_on:
+      file-storage-service:
+        condition: service_started
+      file-analysis-service:
+        condition: service_started
+    ports:
+      - "7003:80"
+    networks: [backend]
+
+# -------------------------------  VOLUMES  -----------------------------
+volumes:
+  file-storage-db-data:
+  file-analysis-db-data:
+  storage-uploads:
+
+# -------------------------------  NETWORKS  ----------------------------
+networks:
+  backend:
+    driver: bridge

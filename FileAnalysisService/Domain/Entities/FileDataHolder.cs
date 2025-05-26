@@ -8,9 +8,9 @@ public class FileDataHolder
     public int ParagraphCount { get; init; } // Количество абзацев
     public int SymbolCount { get; init; }    // Количество символов
 
-    public FileDataHolder(Guid id, int hash, int wordCount, int paragraphCount, int symbolCount)
+    public FileDataHolder(Guid fileId, int hash, int wordCount, int paragraphCount, int symbolCount)
     {
-        FileId = id;
+        FileId = fileId;
         Hash = hash;
         WordCount = wordCount;
         ParagraphCount = paragraphCount;

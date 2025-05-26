@@ -4,7 +4,10 @@ namespace FileAnalysisService.Domain.Interfaces;
 
 public interface IFileAnalysisService
 {
-    FileDataHolder AnalyzeAndSave(string content);
+    FileDataHolder AnalyzeFile(string content);
     FileDataHolder? GetAnalysisResult(Guid fileId);
+    //public FileDataHolder GetFileStats(Guid id);
     bool DeleteAnalysisResult(Guid fileId);
+    
+    Task<FileDataHolder?> GetFileStatsAsync(Guid fileId);
 }

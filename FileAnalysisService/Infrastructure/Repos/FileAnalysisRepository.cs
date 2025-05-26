@@ -11,29 +11,27 @@ public class FileAnalysisRepository : IFileAnalysisRepository
     {
         _context = context;
     }
-
     public FileDataHolder Get(Guid id)
     {
-        return _context.FileDataHolders.FirstOrDefault(f => f.FileId == id);
+        return _context.FilesData.FirstOrDefault(f => f.FileId == id);
     }
-
     public bool Exists(Guid id)
     {
-        return _context.FileDataHolders.Any(f => f.FileId == id);
+        return _context.FilesData.Any(f => f.FileId == id);
     }
 
     public FileDataHolder? Delete(Guid id)
     {
         var file = Get(id);
         if (file == null) return null;
-        _context.FileDataHolders.Remove(file);
+        _context.FilesData.Remove(file);
         _context.SaveChanges();
         return file;
     }
 
     public void Add(FileDataHolder file)
     {
-        _context.FileDataHolders.Add(file);
+        _context.FilesData.Add(file);
         _context.SaveChanges();
     }
 }

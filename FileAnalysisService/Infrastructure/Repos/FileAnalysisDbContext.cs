@@ -3,21 +3,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FileAnalysisService.Infrastructure.Repos;
 
-public sealed class FileAnalysisDbContext : DbContext
+public class FileAnalysisDbContext : DbContext
 {
-    public FileAnalysisDbContext(DbContextOptions options) : base(options)
+    protected readonly IConfiguration _configuration;
+
+    public FileAnalysisDbContext(IConfiguration configuration)
     {
-        
+        _configuration = configuration;
+    }
+    public DbSet<FileDataHolder> FilesData { get; set; } = null!;
+
+    public FileAnalysisDbContext()
+    {
+        Database.EnsureCreated();
     }
     
-    public DbSet<FileDataHolder> FileDataHolders { get; set; }
-    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseNpgsql(_configuration.GetConnectionString("FileAnalysisDatabase"));
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<FileDataHolder>(e =>
+        modelBuilder.Entity<FileDataHolder>(entity =>
         {
-            e.HasKey(x => x.FileId);
-            e.ToTable("file_analysis_results"); 
+            entity.HasKey(e => e.FileId);
+            entity.ToTable("FilesData");
+            entity.Property(e => e.Hash).HasColumnName("hash").IsRequired();
+            entity.Property(e => e.ParagraphCount).HasColumnName("paragraphs").IsRequired();
+            entity.Property(e => e.WordCount).HasColumnName("words").IsRequired();
+            entity.Property(e => e.SymbolCount).HasColumnName("symbols").IsRequired();
         });
     }
 }

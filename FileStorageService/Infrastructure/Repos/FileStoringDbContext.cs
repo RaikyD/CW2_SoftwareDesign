@@ -20,6 +20,17 @@ public class FileStoringDbContext : DbContext
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(_configuration.GetConnectionString("FileStoringDataBase"));
+        optionsBuilder.UseNpgsql(_configuration.GetConnectionString("FileStorageDatabase"));
+    }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<FileHolder>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("FileHolders");
+            entity.Property(e => e.Hash).HasColumnName("hash").IsRequired();
+            entity.Property(e => e.FileName).HasColumnName("fileName").IsRequired();
+            entity.Property(e => e.FileDirectory).HasColumnName("fileDirectory").IsRequired();
+        });
     }
 }
